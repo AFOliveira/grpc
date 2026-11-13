@@ -213,6 +213,13 @@ def _generate_deps_file_content():
                 _removeprefix(filepath, "grpc_root/")
             ):
                 cc_files.add(filepath)
+                # Descriptor initializers are also referenced by channelz/v2.
+                # Include their retained generated sources, not only minitables.
+                descriptor = filepath.replace(
+                    "/upb-gen/", "/upbdefs-gen/"
+                ).replace(".upb_minitable.c", ".upbdefs.c")
+                if os.path.exists(_removeprefix(descriptor, "grpc_root/")):
+                    cc_files.add(descriptor)
         if name.endswith(".cc") or (
             name.endswith(".c")
             and not name.endswith((".upb.c", ".upb_minitable.c"))
